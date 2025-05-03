@@ -1,6 +1,10 @@
 services:
-  microservice-template:
+  data-loader:
     build: .
     ports:
       # You can take any port you like instead of 8080 in your network
       - "8080:8000"
+  qdrant-storage:
+    image: docker.io/qdrant/qdrant
+    ports:
+      -"6333:6333"

@@ -3,3 +3,5 @@ uvicorn
 pydantic
 requests
 httpx
+langchain
+qdrant-client[async]
