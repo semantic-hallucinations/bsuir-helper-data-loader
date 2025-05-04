@@ -1,7 +1,13 @@
-from httpx import AsyncClient, TransportError, HTTPStatusError
-from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_fixed
 from typing import List
-from fastapi import Depends, FastAPI
+
+from fastapi import Request
+from httpx import AsyncClient, HTTPStatusError, TransportError
+from tenacity import (
+    AsyncRetrying,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_fixed,
+)
 
 
 class EmbedClient:
@@ -16,15 +22,15 @@ class EmbedClient:
         async for attempt in AsyncRetrying(
             stop=stop_after_attempt(3),
             wait=wait_fixed(2),
-            retry=retry_if_exception_type((TransportError, HTTPStatusError))
+            retry=retry_if_exception_type((TransportError, HTTPStatusError)),
         ):
             with attempt:
-                resp = await self._client.post("/embed_chunks", json={"chunks":chunks})
+                resp = await self._client.post("/embed", json={"chunks": chunks})
                 resp.raise_for_status()
                 data = resp.json()
                 return data["embeddings"]
         raise RuntimeError("Failed to get embeddings after retries")
 
 
-def get_embed_client(app: FastAPI = Depends()) -> EmbedClient:
-    return app.state.embed_client
+def get_embed_client(request: Request) -> EmbedClient:
+    return request.app.state.embed_client

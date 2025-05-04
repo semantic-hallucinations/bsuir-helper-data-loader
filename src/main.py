@@ -1,21 +1,23 @@
-from fastapi import FastAPI, Depends, HTTPException
-import httpx
-from models import MarkdownDocument, ProcessResult
-from services import (
-    MarkdownChunkSplitter,
-    EmbedClient,
-    get_embed_client,
-    get_qdrant_client,
-    Processor
-)
+import os
 from contextlib import asynccontextmanager
+
+import httpx
+from fastapi import Depends, FastAPI, HTTPException
 from qdrant_client import models
 from qdrant_client.async_qdrant_client import AsyncQdrantClient
 
+from models import MarkdownDocument, ProcessResult
+from services import (
+    EmbedClient,
+    MarkdownChunkSplitter,
+    Processor,
+    get_embed_client,
+    get_qdrant_client,
+)
 
-EMBEDDER_URL = "http://localhost:8001"
-QDRANT_URL = "http://localhost:6333"
-QDRANT_COLLECTION_NAME = "test_documents"
+EMBEDDER_URL = os.getenv("EMBEDDER_URL", None)
+QDRANT_URL = os.getenv("QDRANT_URL", None)
+QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", None)
 
 
 @asynccontextmanager
@@ -23,10 +25,24 @@ async def lifespan(app: FastAPI):
     app.state.embed_client = EmbedClient(base_url=EMBEDDER_URL)
     app.state.qdrant = AsyncQdrantClient(url=QDRANT_URL)
 
-    await app.state.qdrant.create_collection(
-        collection_name=QDRANT_COLLECTION_NAME,
-        vectors_config=models.VectorParams(size=1024, distance=models.Distance.COSINE),
-    )
+    try:
+        existing = await app.state.qdrant.get_collections()
+        names = [col.name for col in existing.collections]
+    except Exception:
+        names = []
+
+    if QDRANT_COLLECTION_NAME not in names:
+        try:
+            await app.state.qdrant.create_collection(
+                collection_name=QDRANT_COLLECTION_NAME,
+                vectors_config=models.VectorParams(
+                    size=1024,
+                    distance=models.Distance.COSINE,
+                ),
+            )
+        except Exception as e:
+            if "already exists" not in str(e).lower():
+                raise
 
     yield
 
@@ -44,9 +60,9 @@ def health():
 
 
 @app.post(
-        "/process_markdown/",
-        summary="chunk split -> embed -> upsert to Qdrant",
-        response_model=ProcessResult
+    "/process_markdown",
+    summary="chunk split -> embed -> upsert to Qdrant",
+    response_model=ProcessResult,
 )
 async def process_markdown(
     md_doc: MarkdownDocument,
@@ -54,12 +70,12 @@ async def process_markdown(
     embed_client: EmbedClient = Depends(get_embed_client),
 ):
     proc = Processor(splitter, embed_client, qdrant)
-    
+
     try:
-        resp = proc.run(md_doc)
+        resp: ProcessResult = await proc.run(md_doc)
     except httpx.HTTPError:
         raise HTTPException(502, "Embedder failed")
-    except Exception:
-        raise HTTPException(503, "Qdrant failed")
+    except Exception as e:
+        raise HTTPException(503, str(e))
 
     return resp

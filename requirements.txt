@@ -5,3 +5,4 @@ requests
 httpx
 langchain
 qdrant-client[async]
+organisation_utils @ https://github.com/semantic-hallucinations/semantic-hallucinations-utils/archive/refs/heads/main.zip
