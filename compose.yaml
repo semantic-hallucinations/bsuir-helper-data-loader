@@ -3,6 +3,8 @@ services:
     image: ghcr.io/semantic-hallucinations/bsuir-helper-embedder:cuda
     ports:
       - "8081:8000"
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface/hub
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -32,3 +34,5 @@ services:
     depends_on:
       bsuir-helper-embedder:
         condition: service_healthy
+volumes:
+  huggingface_cache:
