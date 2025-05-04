@@ -4,10 +4,12 @@ from fastapi import Request
 from qdrant_client import models
 from qdrant_client.async_qdrant_client import AsyncQdrantClient
 
+from models import MarkdownDocument
+
 
 async def save_embeddings_to_qdrant(
     qdrant: AsyncQdrantClient,
-    doc_id: int,
+    doc: MarkdownDocument,
     chunks: List[str],
     embeddings: List[List[float]],
     collection_name: str = "documents",
@@ -16,7 +18,9 @@ async def save_embeddings_to_qdrant(
     points: List[models.PointStruct] = []
     for idx, (chunk, vector) in enumerate(zip(chunks, embeddings)):
         point = models.PointStruct(
-            id=idx, vector=vector, payload={"doc_id": doc_id, "text": chunk}
+            id=idx,
+            vector=vector,
+            payload={"source_url": doc.source_url, "content": chunk},
         )
         points.append(point)
 
