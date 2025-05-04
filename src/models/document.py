@@ -2,8 +2,9 @@ from pydantic import BaseModel
 
 
 class BaseDocument(BaseModel):
-    id: int
+    pass
 
 
 class MarkdownDocument(BaseDocument):
-    markdown: str
+    source_url: str
+    content: str

@@ -1,12 +1,11 @@
 # Example of service usage
 import requests
 
-# firstly compose up your service
 url = "http://localhost:8080/process_markdown"
 headers = None
 data = {
-    "id": 0,
-    "markdown": """
+    "source_url": "https://www.bsuir.by/en/",
+    "content": """
     # Кафедра информационных радиотехнологий
 
 ## Специальность 1-39 01 01 Радиотехника (по направлениям) Направление 1-39 01 01-01 Программируемые радиоэлектронные средства Квалификация специалиста - инженер по радиоэлектронике

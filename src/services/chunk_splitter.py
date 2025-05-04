@@ -27,4 +27,4 @@ class MarkdownChunkSplitter(BaseChunkSplitter[MarkdownDocument]):
         )
 
     def split_to_chunks(self, document: MarkdownDocument) -> List[str]:
-        return self._splitter.split_text(document.markdown)
+        return self._splitter.split_text(document.content)

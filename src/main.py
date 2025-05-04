@@ -12,8 +12,8 @@ from services import (
     MarkdownChunkSplitter,
     Processor,
     get_embed_client,
-    get_qdrant_client,
 )
+from services.qdrant_client import get_qdrant_client
 
 EMBEDDER_URL = os.getenv("EMBEDDER_URL", None)
 QDRANT_URL = os.getenv("QDRANT_URL", None)
