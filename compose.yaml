@@ -1,17 +1,14 @@
 services:
-  data-loader:
-    build: .
-    ports:
-      - "8080:8000"
-    env_file:
-      - .env
-    depends_on:
-      - qdrant-storage
-      - bsuir-helper-embedder
   bsuir-helper-embedder:
     image: ghcr.io/semantic-hallucinations/bsuir-helper-embedder:cuda
     ports:
       - "8081:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
     deploy:
       resources:
         reservations:
@@ -23,3 +20,15 @@ services:
     image: docker.io/qdrant/qdrant
     ports:
       - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+  data-loader:
+    build: .
+    ports:
+      - "8080:8000"
+    env_file:
+      - .env
+    depends_on:
+      bsuir-helper-embedder:
+        condition: service_healthy
