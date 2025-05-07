@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 from fastapi import Request
@@ -16,9 +17,9 @@ async def save_embeddings_to_qdrant(
     batch_size: int = 64,
 ) -> None:
     points: List[models.PointStruct] = []
-    for idx, (chunk, vector) in enumerate(zip(chunks, embeddings)):
+    for chunk, vector in zip(chunks, embeddings):
         point = models.PointStruct(
-            id=idx,
+            id=str(uuid.uuid4()),
             vector=vector,
             payload={"source_url": doc.source_url, "content": chunk},
         )

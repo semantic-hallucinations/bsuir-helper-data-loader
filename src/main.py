@@ -51,7 +51,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-splitter = MarkdownChunkSplitter(chunk_size=1000, chunk_overlap=100)
+splitter = MarkdownChunkSplitter(chunk_size=1000, chunk_overlap=200)
 
 
 @app.get("/health", status_code=200)
@@ -75,7 +75,7 @@ async def process_markdown(
         resp: ProcessResult = await proc.run(md_doc)
     except httpx.HTTPError:
         raise HTTPException(502, "Embedder failed")
-    except Exception as e:
+    except ... as e:
         raise HTTPException(503, str(e))
 
     return resp

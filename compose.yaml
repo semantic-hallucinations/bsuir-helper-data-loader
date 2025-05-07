@@ -5,6 +5,8 @@ services:
       - "8081:8000"
     volumes:
       - huggingface_cache:/root/.cache/huggingface/hub
+    env_file:
+      - .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -34,5 +36,19 @@ services:
     depends_on:
       bsuir-helper-embedder:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+  # bsuir-site-parser:
+  #   image: ghcr.io/semantic-hallucinations/bsuir-site-parser:latest
+  #   depends_on:
+  #     data-loader:
+  #       condition: service_healthy
+  #   env_file:
+  #     - .env
+  #   command: ["python", "main.py"]
 volumes:
   huggingface_cache:

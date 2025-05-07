@@ -27,6 +27,7 @@ class Processor:
         logger.log(logging.INFO, "Getting embeddings...")
         cleaned_chunks = await self._clean_markdown_chunks(chunks)
         embeddings = await self.embed_client.embed(cleaned_chunks)
+        # logger.log(logging.INFO, str(cleaned_chunks))
         logger.log(logging.INFO, "Embeddings received")
 
         logger.log(logging.INFO, "Saving to Qdrant...")
