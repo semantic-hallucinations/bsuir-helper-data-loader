@@ -4,10 +4,10 @@ from qdrant_client import QdrantClient
 # URLs must be localhost:PORT where PORT is an external port from your Docker compose
 EMBEDDER_URL = "http://localhost:8081"
 QDRANT_URL = "http://localhost:6333"
-QDRANT_COLLECTION_NAME = "test2_documents"
+QDRANT_COLLECTION_NAME = "bsuir_documents"
 
 
-query = "Самодумкин Сергей Александрович"
+query = "Где купить блинчики в БГУИР?"
 chunks = []
 chunks.append(query)
 resp_embeds = requests.post(url=f"{EMBEDDER_URL}/embed", json={"chunks": chunks}).json()

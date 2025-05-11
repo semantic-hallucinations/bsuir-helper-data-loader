@@ -75,7 +75,8 @@ async def process_markdown(
         resp: ProcessResult = await proc.run(md_doc)
     except httpx.HTTPError:
         raise HTTPException(502, "Embedder failed")
-    except ... as e:
+    except Exception as e:
+        print(e)
         raise HTTPException(503, str(e))
 
     return resp
