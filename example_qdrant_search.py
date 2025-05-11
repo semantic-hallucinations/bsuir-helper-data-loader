@@ -7,7 +7,7 @@ QDRANT_URL = "http://localhost:6333"
 QDRANT_COLLECTION_NAME = "bsuir_documents"
 
 
-query = "Где купить блинчики в БГУИР?"
+query = "Корпуса БГУИР"
 chunks = []
 chunks.append(query)
 resp_embeds = requests.post(url=f"{EMBEDDER_URL}/embed", json={"chunks": chunks}).json()
