@@ -42,13 +42,13 @@ services:
       timeout: 5s
       retries: 5
       start_period: 300s
-  # bsuir-site-parser:
-  #   image: ghcr.io/semantic-hallucinations/bsuir-site-parser:latest
-  #   depends_on:
-  #     data-loader:
-  #       condition: service_healthy
-  #   env_file:
-  #     - .env
-  #   command: ["python", "main.py"]
+  bsuir-site-parser:
+    image: ghcr.io/semantic-hallucinations/bsuir-site-parser:latest
+    depends_on:
+      data-loader:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: ["python", "main.py"]
 volumes:
   huggingface_cache:
